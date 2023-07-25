@@ -31,12 +31,14 @@ class Application {
 
         // 光源を作成
         {
-            const spotLight = new THREE.SpotLight(0xffffff, 4, 2000, Math.PI / 2, 0.2, 1.5);
-            spotLight.position.set(500, 300, 500);
-            spotLight.castShadow = true; // 影を落とす設定
-            spotLight.shadow.mapSize.width = 2048;
-            spotLight.shadow.mapSize.height = 2048;
-            this.scene.add(spotLight);
+            // const light = new THREE.DirectionalLight(0xffffff, 4, 2000, Math.PI / 2, 0.2, 1.5);
+            const light = new THREE.DirectionalLight(0xffffff, 2);
+            // const light = new THREE.AmbientLight(0xFFFFFF, 1.0);
+            light.position.set(500, 300, 500);
+            light.castShadow = true; // 影を落とす設定
+            // light.shadow.mapSize.width = 2048;
+            // light.shadow.mapSize.height = 2048;
+            this.scene.add(light);
         }
 
         this.Setup();
@@ -54,34 +56,45 @@ class Application {
 
     // 最初に一度だけ呼ばれる
     Setup() {
-        // マス目を作成
         {
-
-            const geometry = new THREE.BoxGeometry(45, 45, 45);
-
-            // 立方体の作成
-            // 立方体のマテリアルとジオメトリを作成
             const material = new THREE.MeshStandardMaterial({
                 color: Math.round((Math.random() - 0.5) * 0xffffff),
                 roughness: 0.1,
                 metalness: 0.2,
+//                wireframe: true
             });
-            const box = new THREE.Mesh(geometry, material);
-            box.position.x = 0;
-            box.position.y = 0;
-            box.position.z = 0;
 
-            // 影の設定
-            box.receiveShadow = true;
-            box.castShadow = true;
-            this.scene.add(box);
+            this.group = new THREE.Group();
+            this.scene.add( this.group );
 
+            const geometry = new THREE.ConeGeometry(45, 45, 45);
+            this.mesh = new THREE.Mesh(geometry, material);
+            this.mesh.position.x = 0;
+            this.mesh.position.y = 0;
+            this.mesh.position.z = 0;
+            this.mesh.receiveShadow = true;
+            this.mesh.castShadow = true;
+            this.group.add(this.mesh);
+
+            const geometry_cylinder = new THREE.CylinderGeometry(20,20,30,50);
+            const mesh_cylinder = new THREE.Mesh(geometry_cylinder, material);
+            mesh_cylinder.position.x = 0;
+            mesh_cylinder.position.y = 30;
+            mesh_cylinder.position.z = 0;
+            mesh_cylinder.receiveShadow = true;
+            mesh_cylinder.castShadow = true;
+            this.group.add(mesh_cylinder);
+
+            this.group.rotation.x = Math.PI;
         }
+
+        this.time = 0;
     }
 
 
     // 再描画の度に呼ばれる
     Loop() {
-
+        this.time ++;
+        this.group.position.y += 10*Math.sin(this.time/5);
     }
 }
